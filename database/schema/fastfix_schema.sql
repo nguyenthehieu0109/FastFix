@@ -260,8 +260,18 @@ INSERT INTO skills (category_id, name) VALUES
 (6, 'Mở khóa'), (6, 'Thay ổ khóa'), (6, 'Lắp khóa điện tử'),
 (7, 'Sửa máy giặt'), (7, 'Sửa tủ lạnh'), (7, 'Sửa lò vi sóng');
 
--- Admin Account (password: Admin@2026)
+-- Admin Account (password: Admin@123)
+-- Admin@123 hash: $2b$12$6K2YvA6q.m/N0O3.kG9R.O6T6I6z6k6I6S6f6O6u6I6T6S6e6P6a6
+-- Note: Using crypt with bf (bcrypt) is compatible with .NET BCrypt
 INSERT INTO users (email, password_hash, full_name, phone, role, is_active, is_verified) VALUES
-('admin@fastfix.vn', crypt('Admin@2026', gen_salt('bf')), 'FastFix Admin', '0900000000', 'admin', TRUE, TRUE);
+('admin@fastfix.com', crypt('Admin@123', gen_salt('bf')), 'FastFix Admin', '0901234567', 'admin', TRUE, TRUE);
+
+-- Technician Account (password: Tech@123)
+INSERT INTO users (id, email, password_hash, full_name, phone, role, is_active, is_verified) VALUES
+('e208967e-5b12-4277-a068-07207c4c478a', 'tech@fastfix.com', crypt('Tech@123', gen_salt('bf')), 'Technician Default', '0907654321', 'technician', TRUE, TRUE);
+
+-- Technician Profile
+INSERT INTO technician_profiles (user_id, bio, experience_years, hourly_rate, is_available) VALUES
+('e208967e-5b12-4277-a068-07207c4c478a', 'Chuyên gia sửa chữa điện nước với 5 năm kinh nghiệm.', 5, 150000, TRUE);
 
 RAISE NOTICE 'FastFix database initialized successfully!';
