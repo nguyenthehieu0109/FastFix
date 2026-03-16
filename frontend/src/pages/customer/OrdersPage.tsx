@@ -31,9 +31,6 @@ export default function OrdersPage() {
                         Theo dõi trạng thái và tiến độ sửa chữa thiết bị của bạn.
                     </p>
                 </div>
-                <Button className="bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20 rounded-xl px-5 h-12 flex items-center gap-2 font-semibold">
-                    <Plus size={18} /> Đặt Lịch Sửa Chữa
-                </Button>
             </div>
 
             <div className="bg-[#0a1122] border border-white/5 rounded-2xl p-4 sm:p-6">

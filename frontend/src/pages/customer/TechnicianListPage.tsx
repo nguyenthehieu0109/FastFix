@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Star, MapPin, CheckCircle, Phone, MessageSquare, Filter } from 'lucide-react';
+import { Search, Star, MapPin, CheckCircle, Phone, MessageSquare, Filter, Plus, Camera, Upload, Mic, MicOff, Calendar, Clock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 const CATEGORIES = ['Tất cả', 'Điều hòa', 'Tủ lạnh', 'Máy giặt', 'Điện nước', 'Thiết bị gia dụng'];
 
@@ -48,6 +51,7 @@ const MOCK_TECHNICIANS = [
 export default function TechnicianListPage() {
     const [search, setSearch] = useState('');
     const [activeCategory, setActiveCategory] = useState('Tất cả');
+    const [isRecording, setIsRecording] = useState(false);
 
     const filtered = MOCK_TECHNICIANS.filter(t => {
         const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -63,9 +67,84 @@ export default function TechnicianListPage() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
             >
-                <h1 className="text-2xl font-bold text-white">Danh sách Kỹ thuật viên</h1>
-                <p className="text-zinc-400 mt-1 text-sm">Tìm và chọn thợ sửa chữa phù hợp với nhu cầu của bạn</p>
+                <div>
+                    <h1 className="text-2xl font-bold text-white">Danh sách Kỹ thuật viên</h1>
+                    <p className="text-zinc-400 mt-1 text-sm">Tìm và chọn thợ sửa chữa phù hợp với nhu cầu của bạn</p>
+                </div>
+
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button className="bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20 rounded-xl px-5 h-12 flex items-center gap-2 font-semibold">
+                            <Plus size={18} /> Đặt Lịch Sửa Chữa
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px] bg-[#0a1122] border-white/10 text-white">
+                        <DialogHeader>
+                            <DialogTitle className="text-xl">Đặt lịch sửa chữa</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 mt-4">
+                            <div className="space-y-2">
+                                <Label>1. Mô tả sự cố</Label>
+                                <Textarea placeholder="Nhập mô tả sự cố của bạn..." className="bg-white/5 border-white/10" />
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <Label>2. Tải ảnh sự cố</Label>
+                                <div className="flex gap-2">
+                                    <Button variant="outline" className="flex-1 bg-white/5 border-white/10">
+                                        <Camera className="w-4 h-4 mr-2" /> Chụp ảnh
+                                    </Button>
+                                    <Button variant="outline" className="flex-1 bg-white/5 border-white/10">
+                                        <Upload className="w-4 h-4 mr-2" /> Tải ảnh lên
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>3. Ghi âm mô tả sự cố</Label>
+                                <Button 
+                                    variant="outline" 
+                                    className={`w-full border-white/10 ${isRecording ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 hover:text-red-500' : 'bg-white/5 hover:bg-white/10 hover:text-white text-zinc-300'}`}
+                                    onClick={() => setIsRecording(!isRecording)}
+                                >
+                                    {isRecording ? <MicOff className="w-4 h-4 mr-2" /> : <Mic className="w-4 h-4 mr-2" />}
+                                    {isRecording ? 'Dừng ghi âm' : 'Bắt đầu ghi âm'}
+                                </Button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>4. Chọn ngày</Label>
+                                    <div className="relative">
+                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                                        <Input type="date" className="pl-9 bg-white/5 border-white/10 text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert" />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>5. Chọn thời gian</Label>
+                                    <div className="relative">
+                                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                                        <Input type="time" className="pl-9 bg-white/5 border-white/10 text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>6. Địa chỉ sửa chữa</Label>
+                                <div className="relative">
+                                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                                    <Input placeholder="Nhập địa chỉ..." className="pl-9 bg-white/5 border-white/10 text-white" />
+                                </div>
+                            </div>
+
+                            <Button className="w-full mt-4 bg-primary hover:bg-primary-dark text-white h-11">
+                                Gửi yêu cầu sửa chữa
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </motion.div>
 
             {/* Search & Filter */}
@@ -183,6 +262,12 @@ export default function TechnicianListPage() {
                                 Nhắn tin
                             </Button>
                         </div>
+                        <Button
+                            className="w-full mt-2 h-9 text-sm font-semibold bg-primary hover:bg-primary-dark text-white rounded-lg shadow-md shadow-primary/20 transition-all"
+                        >
+                            <CheckCircle className="w-4 h-4 mr-1.5" />
+                            Đặt thợ
+                        </Button>
                     </motion.div>
                 ))}
             </div>
