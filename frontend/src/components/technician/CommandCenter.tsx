@@ -1,205 +1,221 @@
 import { useState } from 'react';
 import {
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  MapPin,
-  DollarSign,
-  TrendingUp,
-  Users,
-  Phone,
-  Briefcase,
+  Clock, CheckCircle, AlertCircle, MapPin, DollarSign,
+  TrendingUp, Phone, Briefcase, Star, ArrowUpRight,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, AreaChart, Area
+} from 'recharts';
+
+const earningsData = [
+  { name: 'Th 2', total: 120000 },
+  { name: 'Th 3', total: 180000 },
+  { name: 'Th 4', total: 150000 },
+  { name: 'Th 5', total: 250000 },
+  { name: 'Th 6', total: 210000 },
+  { name: 'Th 7', total: 320000 },
+  { name: 'CN', total: 280000 },
+];
 
 export function CommandCenter() {
   const [isOnline, setIsOnline] = useState(true);
 
   const stats = [
-    {
-      label: 'Công Việc Hôm Nay',
-      value: '4',
-      icon: Briefcase,
-      color: 'text-blue-600',
-    },
-    {
-      label: 'Hoàn Thành',
-      value: '2',
-      icon: CheckCircle,
-      color: 'text-green-600',
-    },
-    {
-      label: 'Đang Thực Hiện',
-      value: '1',
-      icon: Clock,
-      color: 'text-amber-600',
-    },
-    {
-      label: 'Chờ Xử Lý',
-      value: '1',
-      icon: AlertCircle,
-      color: 'text-red-600',
-    },
-    {
-      label: 'Thu Nhập Hôm Nay',
-      value: '180.000đ',
-      icon: DollarSign,
-      color: 'text-green-600',
-    },
-    {
-      label: 'Đánh Giá',
-      value: '4.9',
-      icon: TrendingUp,
-      color: 'text-amber-600',
-    },
+    { label: 'Công Việc Hôm Nay', value: '4', icon: Briefcase, color: 'blue', trend: '+2' },
+    { label: 'Hoàn Thành', value: '2', icon: CheckCircle, color: 'green', trend: '100%' },
+    { label: 'Đang Thực Hiện', value: '1', icon: Clock, color: 'amber', trend: 'Active' },
+    { label: 'Thu Nhập Hôm Nay', value: '180.000đ', icon: DollarSign, color: 'emerald', trend: '+15%' },
   ];
+
+  const colorMap: Record<string, { icon: string; iconBg: string; text: string }> = {
+    blue: { icon: 'text-blue-400', iconBg: 'bg-blue-500/10', text: 'text-blue-400' },
+    green: { icon: 'text-emerald-400', iconBg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+    emerald: { icon: 'text-emerald-400', iconBg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+    amber: { icon: 'text-amber-400', iconBg: 'bg-amber-500/10', text: 'text-amber-400' },
+    red: { icon: 'text-red-400', iconBg: 'bg-red-500/10', text: 'text-red-400' },
+  };
 
   const upcomingJobs = [
-    {
-      id: 1,
-      title: 'Sửa Chữa Điều Hòa - Văn Phòng Trung Tâm',
-      customer: 'Công Ty John',
-      time: '10:30 SA',
-      location: 'Trung Tâm, cách 2.3 km',
-      price: '85.000đ',
-      priority: 'high',
-    },
-    {
-      id: 2,
-      title: 'Lắp Đặt Ống Nước',
-      customer: 'Sarah Martinez',
-      time: '13:00',
-      location: 'Giữa Thành Phố, cách 5.1 km',
-      price: '120.000đ',
-      priority: 'medium',
-    },
-    {
-      id: 3,
-      title: 'Kiểm Tra Điện',
-      customer: 'Công Ty Tech Solutions',
-      time: '15:00',
-      location: 'Khu Kinh Doanh, cách 8.4 km',
-      price: '95.000đ',
-      priority: 'low',
-    },
+    { id: 1, title: 'Sửa Chữa Điều Hòa - Văn Phòng Trung Tâm', customer: 'Công Ty John', time: '10:30 SA', location: 'Trung Tâm, cách 2.3 km', price: '85.000đ', priority: 'high' },
+    { id: 2, title: 'Lắp Đặt Ống Nước', customer: 'Sarah Martinez', time: '13:00', location: 'Giữa Thành Phố, cách 5.1 km', price: '120.000đ', priority: 'medium' },
   ];
 
+  const priorityMap: Record<string, { label: string; bg: string; text: string; border: string }> = {
+    high: { label: 'Ưu Tiên Cao', bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-l-rose-500' },
+    medium: { label: 'Ưu Tiên Trung Bình', bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-l-amber-500' },
+    low: { label: 'Ưu Tiên Thấp', bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-l-blue-500' },
+  };
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-2 md:p-6 space-y-6 pb-20 overflow-x-hidden">
+      {/* Header with Online/Offline Toggle */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Bảng Điều Khiển</h1>
-          <p className="text-muted-foreground mt-1">Thứ Hai, 3 Tháng 3, 2025</p>
+          <h1 className="text-2xl font-extrabold text-foreground flex items-center gap-2">
+            Bảng Điều Khiển
+            <span className="text-blue-500">Live</span>
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${isOnline ? 'bg-emerald-500/10 text-emerald-500' : 'bg-white/5 text-zinc-500'}`}>
-            <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-600'}`} />
-            <span className="font-semibold text-xs uppercase tracking-wider">{isOnline ? 'Trực Tuyến' : 'Ngoại Tuyến'}</span>
-          </div>
-          <Button
-            onClick={() => setIsOnline(!isOnline)}
-            variant={isOnline ? 'default' : 'outline'}
+
+        <button
+          onClick={() => setIsOnline(!isOnline)}
+          className={cn(
+            'relative flex items-center gap-3 px-1 py-1 rounded-full transition-all duration-500 border-2 w-[160px]',
+            isOnline
+              ? 'bg-emerald-500/10 border-emerald-500/30'
+              : 'bg-slate-500/10 border-slate-500/30'
+          )}
+        >
+          <motion.div
+            layout
+            className={cn(
+              'w-8 h-8 rounded-full flex items-center justify-center shadow-lg',
+              isOnline ? 'bg-emerald-500 text-white' : 'bg-slate-500 text-white'
+            )}
+            initial={false}
+            animate={{ x: isOnline ? 116 : 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
-            {isOnline ? 'Chuyển Ngoại Tuyến' : 'Chuyển Trực Tuyến'}
-          </Button>
-        </div>
+            {isOnline ? <TrendingUp size={16} /> : <Clock size={16} />}
+          </motion.div>
+          
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={isOnline ? 'online' : 'offline'}
+              initial={{ opacity: 0, x: isOnline ? -10 : 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isOnline ? 10 : -10 }}
+              className={cn(
+                'absolute text-[11px] font-bold uppercase tracking-widest',
+                isOnline ? 'left-4 text-emerald-400' : 'right-4 text-slate-500'
+              )}
+            >
+              {isOnline ? 'Trực Tuyến' : 'Ngoại Tuyến'}
+            </motion.span>
+          </AnimatePresence>
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, idx) => {
           const Icon = stat.icon;
+          const colors = colorMap[stat.color];
           return (
-            <Card key={idx} className="p-6 bg-white/5 border-white/5 rounded-2xl shadow-sm hover:shadow-md transition-all hover:bg-white/[0.07] group">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{stat.label}</p>
-                  <p className="text-2xl font-black text-white mt-1 italic tracking-tight">{stat.value}</p>
+            <motion.div
+              key={idx}
+              whileHover={{ y: -5 }}
+              className="bg-[#0f172a]/50 backdrop-blur-md rounded-2xl p-5 border border-white/5 hover:border-white/10 transition-all shadow-xl"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className={cn('p-3 rounded-xl', colors.iconBg)}>
+                  <Icon className={cn('w-5 h-5', colors.icon)} />
                 </div>
-                <div className={cn("p-3 rounded-xl bg-white/5 group-hover:scale-110 transition-transform", stat.color.replace('text-', 'bg-').replace('600', '500/10'))}>
-                  <Icon className={cn("w-6 h-6", stat.color.replace('600', '500'))} />
+                <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full">
+                  <ArrowUpRight size={10} />
+                  {stat.trend}
                 </div>
               </div>
-            </Card>
+              <div>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">{stat.label}</p>
+                <p className="text-2xl font-extrabold text-foreground mt-1">{stat.value}</p>
+              </div>
+            </motion.div>
           );
         })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Earnings Chart */}
         <div className="lg:col-span-2 space-y-4">
-          <div>
-            <h2 className="text-xl font-bold text-foreground mb-4">Lịch Hôm Nay</h2>
-            <div className="space-y-3">
-              {upcomingJobs.map((job) => (
-                <Card
-                  key={job.id}
-                  className="p-5 bg-white/5 border-white/5 border-l-4 border-l-blue-500 hover:shadow-lg transition-all hover:bg-white/[0.07] group"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="font-bold text-white text-lg group-hover:text-blue-400 transition-colors">{job.title}</h3>
-                      <p className="text-sm text-zinc-400 font-medium mt-0.5">{job.customer}</p>
-                    </div>
-                    <span className={cn(
-                      "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
-                      job.priority === 'high' ? 'bg-rose-500/10 text-rose-500' :
-                      job.priority === 'medium' ? 'bg-amber-500/10 text-amber-500' :
-                      'bg-blue-500/10 text-blue-500'
-                    )}>
-                      {job.priority === 'high' ? 'Ưu Tiên Cao' : job.priority === 'medium' ? 'Trung Bình' : 'Thấp'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-6 text-xs font-bold uppercase tracking-widest">
-                    <div className="flex items-center gap-2 text-zinc-500">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{job.time}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-zinc-500">
-                      <MapPin className="w-3.5 h-3.5" />
-                      <span>{job.location}</span>
-                    </div>
-                    <div className="text-blue-500 ml-auto text-sm">{job.price}</div>
-                  </div>
-                </Card>
-              ))}
+          <div className="bg-[#0f172a]/50 backdrop-blur-md rounded-2xl p-6 border border-white/5 shadow-xl h-full">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-lg font-bold text-foreground">Thu Nhập Hàng Tuần</h2>
+              <div className="flex items-center gap-4 text-xs font-medium">
+                <div className="flex items-center gap-2 text-blue-400">
+                  <div className="w-2 h-2 rounded-full bg-blue-500" />
+                  Tổng Thu (VNĐ)
+                </div>
+              </div>
+            </div>
+            
+            <div className="h-[280px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={earningsData}>
+                  <defs>
+                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    tickFormatter={(value) => `${value / 1000}k`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                    itemStyle={{ color: '#f1f5f9', fontWeight: 'bold' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="total" 
+                    stroke="#3b82f6" 
+                    strokeWidth={3}
+                    fillOpacity={1} 
+                    fill="url(#colorTotal)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-xl font-bold text-foreground mb-4">Hành Động Nhanh</h2>
-            <div className="space-y-2">
-              <Button className="w-full justify-start gap-2" variant="outline">
-                <Phone className="w-4 h-4" />
-                Gọi Khách Hàng Tiếp Theo
-              </Button>
-              <Button className="w-full justify-start gap-2" variant="outline">
-                <MapPin className="w-4 h-4" />
-                Lấy Hướng Dẫn
-              </Button>
-              <Button className="w-full justify-start gap-2" variant="outline">
-                <CheckCircle className="w-4 h-4" />
-                Đánh Dấu Công Việc Hoàn Thành
-              </Button>
-              <Button className="w-full justify-start gap-2" variant="outline">
-                <AlertCircle className="w-4 h-4" />
-                Báo Cáo Vấn Đề
-              </Button>
+        {/* Quick Actions & Tips */}
+        <div className="space-y-6">
+          <div className="bg-[#0f172a]/50 backdrop-blur-md rounded-2xl p-6 border border-white/5 shadow-xl">
+            <h2 className="text-base font-bold text-foreground mb-4">Lịch Công Việc</h2>
+            <div className="space-y-4">
+              {upcomingJobs.map((job) => {
+                const p = priorityMap[job.priority];
+                return (
+                  <div key={job.id} className={cn('p-4 rounded-xl bg-white/[0.03] border border-white/5 border-l-4 transition-all hover:bg-white/[0.05]', p.border)}>
+                    <p className="text-xs font-bold text-blue-400 mb-1">{job.time}</p>
+                    <h3 className="text-sm font-bold text-slate-200">{job.title}</h3>
+                    <p className="text-[11px] text-slate-500 mt-1">{job.customer} • {job.location}</p>
+                  </div>
+                );
+              })}
             </div>
+            <button className="w-full mt-4 py-2 text-xs font-bold text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-widest">
+              Xem Toàn Bộ Lịch
+            </button>
           </div>
 
-          <Card className="p-6 bg-blue-600/5 border-blue-500/10 rounded-2xl">
-            <h3 className="font-bold text-blue-400 mb-2 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-2xl p-6 border border-blue-500/20">
+            <h3 className="font-bold text-blue-400 mb-2 flex items-center gap-2 text-sm">
               <Star className="w-4 h-4 fill-blue-400" />
               Mẹo Của Ngày
             </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed font-medium">
-              Hoàn thành công việc kịp thời và giao tiếp tốt với khách hàng để duy trì đánh giá 4.9!
+            <p className="text-[13px] text-slate-300 leading-relaxed italic">
+              "Giao tiếp là chìa khóa. Luôn thông báo cho khách hàng nếu bạn đến trễ hơn 5 phút để bảo vệ đánh giá 5 sao của mình."
             </p>
-          </Card>
+          </div>
         </div>
       </div>
     </div>

@@ -14,16 +14,16 @@ export default defineConfig({
     port: 3000,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:5000",
+        target: "http://backend:5000",
         changeOrigin: true,
       },
       "/hubs": {
-        target: "http://127.0.0.1:5000",
+        target: "http://backend:5000",
         changeOrigin: true,
         ws: true,
       },
       "/ai": {
-        target: "http://127.0.0.1:8000",
+        target: "http://ai-service:8000",
         changeOrigin: true,
       },
     },

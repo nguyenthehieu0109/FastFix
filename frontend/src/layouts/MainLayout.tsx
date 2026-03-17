@@ -178,11 +178,11 @@ function Navbar() {
                         <LayoutDashboard size={16} /> Bảng công việc
                       </Link>
                       <Link
-                        to="/technician/dang-thuc-hien"
+                        to="/technician/don-hang/dang-cho"
                         onClick={() => setShowMenu(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 transition-all"
                       >
-                        <ClipboardList size={16} /> Đơn sửa chữa
+                        <ClipboardList size={16} /> Đơn hàng
                       </Link>
                     </>
                   ) : (

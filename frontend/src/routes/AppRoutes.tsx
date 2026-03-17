@@ -1,13 +1,13 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-// Layouts - loaded eagerly
+// Layouts
 import MainLayout from '@/layouts/MainLayout';
 import CustomerLayout from '@/layouts/CustomerLayout';
 import AdminLayout from '@/layouts/AdminLayout';
 import TechnicianLayout from '@/layouts/TechnicianLayout';
 
-// Lazy-loaded pages
+// Lazy-loaded pages — Customer
 const HomePage = lazy(() => import('@/pages/customer/HomePage'));
 const ProfilePage = lazy(() => import('@/pages/customer/ProfilePage'));
 const TechnicianListPage = lazy(() => import('@/pages/customer/TechnicianListPage'));
@@ -16,18 +16,18 @@ const ContactTechnicianPage = lazy(() => import('@/pages/customer/ContactTechnic
 const HistoryPage = lazy(() => import('@/pages/customer/HistoryPage'));
 const ReviewsPage = lazy(() => import('@/pages/customer/ReviewsPage'));
 
+// Lazy-loaded pages — Admin
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const RequestsPage = lazy(() => import('@/pages/admin/RequestsPage'));
 const TechniciansPage = lazy(() => import('@/pages/admin/TechniciansPage'));
 
+// Lazy-loaded pages — Technician
 const TechDashboardPage = lazy(() => import('@/pages/technician/DashboardPage'));
+const TechProfilePage = lazy(() => import('@/pages/technician/ProfilePage'));
 const TechNewRequestsPage = lazy(() => import('@/pages/technician/NewRequestsPage'));
+const TechAcceptedRequestsPage = lazy(() => import('@/pages/technician/AcceptedRequestsPage'));
 const TechInProgressPage = lazy(() => import('@/pages/technician/InProgressPage'));
-const TechCustomerHubPage = lazy(() => import('@/pages/technician/CustomerHubPage'));
-const TechCommunicationPage = lazy(() => import('@/pages/technician/CommunicationPage'));
-const AnalyticsPage = lazy(() => import('@/pages/technician/AnalyticsPage'));
-const PaymentManagerPage = lazy(() => import('@/pages/technician/PaymentManagerPage'));
-const SettingsPage = lazy(() => import('@/pages/technician/SettingsPage'));
+const TechHistoryPage = lazy(() => import('@/pages/technician/HistoryPage'));
 
 function Loading() {
   return (
@@ -41,12 +41,12 @@ export default function AppRoutes() {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
-        {/* ── Public Routes ── */}
+        {/* Public */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
         </Route>
 
-        {/* ── Customer Portal Routes ── */}
+        {/* Customer Portal */}
         <Route path="/customer" element={<CustomerLayout />}>
           <Route index element={<TechnicianListPage />} />
           <Route path="technicians" element={<TechnicianListPage />} />
@@ -57,23 +57,21 @@ export default function AppRoutes() {
           <Route path="reviews" element={<ReviewsPage />} />
         </Route>
 
-        {/* ── Admin Routes ── */}
+        {/* Admin */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="yeu-cau" element={<RequestsPage />} />
           <Route path="ky-thuat-vien" element={<TechniciansPage />} />
         </Route>
 
-        {/* ── Technician (Worker) Routes ── */}
+        {/* Technician */}
         <Route path="/technician" element={<TechnicianLayout />}>
           <Route index element={<TechDashboardPage />} />
-          <Route path="yeu-cau-moi" element={<TechNewRequestsPage />} />
-          <Route path="dang-thuc-hien" element={<TechInProgressPage />} />
-          <Route path="khach-hang" element={<TechCustomerHubPage />} />
-          <Route path="giao-tiep" element={<TechCommunicationPage />} />
-          <Route path="phan-tich" element={<AnalyticsPage />} />
-          <Route path="thanh-toan" element={<PaymentManagerPage />} />
-          <Route path="cai-dat" element={<SettingsPage />} />
+          <Route path="ho-so" element={<TechProfilePage />} />
+          <Route path="don-hang/dang-cho" element={<TechNewRequestsPage />} />
+          <Route path="don-hang/da-tiep-nhan" element={<TechAcceptedRequestsPage />} />
+          <Route path="don-hang/dang-thuc-hien" element={<TechInProgressPage />} />
+          <Route path="lich-su" element={<TechHistoryPage />} />
         </Route>
       </Routes>
     </Suspense>

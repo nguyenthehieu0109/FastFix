@@ -1,50 +1,73 @@
-import { Menu, Bell, Settings, User, LogOut } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Menu, Bell, User, LogOut, ChevronDown } from 'lucide-react';
 import useAuthStore from '@/store/authStore';
 
 export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const { user, logout } = useAuthStore();
-  const userName = user?.fullName || 'Tham Khách Hàng';
-  
+  const userName = user?.fullName || 'Alex Johnson';
+  const userEmail = user?.email || 'alex@fastfix.com';
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <header className="h-16 border-b border-white/5 bg-background/80 backdrop-blur-xl flex items-center justify-between px-6 sticky top-0 z-30">
+    <header className="h-16 border-b border-white/5 bg-[#050b18]/80 backdrop-blur-xl flex items-center justify-between px-6 sticky top-0 z-30">
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
-          className="p-2 hover:bg-secondary rounded-lg md:hidden"
+          className="p-2 hover:bg-white/5 rounded-lg md:hidden transition-colors"
         >
-          <Menu className="w-5 h-5" />
+          <Menu className="w-5 h-5 text-slate-400" />
         </button>
-        <h2 className="text-lg font-semibold text-foreground hidden md:block">
+        <h2 className="text-base font-medium text-slate-300 hidden md:block">
           Chào mừng, {userName.split(' ')[0] || userName} 👋
         </h2>
       </div>
 
-      <div className="flex items-center gap-4">
-        <button className="p-2 hover:bg-secondary rounded-lg relative">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
+      <div className="flex items-center gap-3">
+        <button className="p-2 hover:bg-white/5 rounded-lg relative transition-colors">
+          <Bell className="w-5 h-5 text-slate-400" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
         </button>
 
-        <div className="flex items-center gap-2 pl-4 border-l border-border">
-          <Link to="/technician/cai-dat" className="p-2 hover:bg-secondary rounded-lg">
-            <Settings className="w-5 h-5" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 px-3 py-2 hover:bg-secondary rounded-lg">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <User className="w-4 h-4" />
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/5 rounded-xl transition-colors border border-transparent hover:border-white/10"
+          >
+            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+              <User className="w-4 h-4 text-blue-400" />
+            </div>
+            <span className="text-sm font-medium text-slate-300 hidden sm:inline">{userName}</span>
+            <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 top-full mt-2 w-56 bg-[#0f172a] rounded-xl shadow-2xl shadow-black/40 border border-white/10 py-2 z-50 backdrop-blur-2xl">
+              <div className="px-4 py-3 border-b border-white/5">
+                <p className="text-sm font-semibold text-white">{userName}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{userEmail}</p>
               </div>
-              <span className="text-sm font-medium hidden sm:inline">{userName}</span>
-            </button>
-            <button 
-              onClick={() => logout()}
-              className="p-2 text-destructive hover:bg-destructive/10 rounded-lg"
-              title="Đăng xuất"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
-          </div>
+              <div className="py-1">
+                <button
+                  onClick={() => { logout(); setDropdownOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/5 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Đăng Xuất
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>
