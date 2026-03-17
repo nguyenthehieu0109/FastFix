@@ -4,8 +4,8 @@ import useAuthStore from '@/store/authStore';
 
 export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const { user, logout } = useAuthStore();
-  const userName = user?.fullName || 'Alex Johnson';
-  const userEmail = user?.email || 'alex@fastfix.com';
+  const userName = user?.fullName || 'Người dùng';
+  const userEmail = user?.email || '';
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

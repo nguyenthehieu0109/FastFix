@@ -8,12 +8,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import technicianService, { type TechnicianProfile } from '@/services/technicianService';
 import toast from 'react-hot-toast';
+import useAuthStore from '@/store/authStore';
 
 export default function TechProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<TechnicianProfile | null>(null);
+  const { fetchMe, logout } = useAuthStore();
 
   // Form State
   const [formData, setFormData] = useState({
@@ -60,6 +62,7 @@ export default function TechProfilePage() {
       toast.success('Cập nhật hồ sơ thành công');
       setIsEditing(false);
       await fetchProfile();
+      await fetchMe(); // Sync global user state for header
     } catch (err) {
       toast.error('Lỗi khi cập nhật hồ sơ');
       console.error(err);
@@ -238,7 +241,10 @@ export default function TechProfilePage() {
           </div>
 
           <div className="bg-[#0f172a]/50 backdrop-blur-md rounded-3xl border border-white/5 p-4 shadow-xl">
-             <button className="w-full flex items-center justify-center gap-3 py-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
+             <button 
+               onClick={() => logout()}
+               className="w-full flex items-center justify-center gap-3 py-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-2xl font-black text-xs uppercase tracking-widest transition-all"
+             >
                 <LogOut size={16} />
                 Đăng xuất tài khoản
              </button>

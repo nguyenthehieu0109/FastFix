@@ -8,21 +8,32 @@ import { motion } from 'framer-motion';
 export default function TechnicianLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, fetchMe } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       const token = localStorage.getItem('fastfix_token');
       if (!token || !isAuthenticated) {
         navigate('/?login=technician');
+        return;
+      }
+
+      // If authenticated but no user data, fetch it
+      if (!user) {
+        try {
+          await fetchMe();
+          setIsAuthorized(true);
+        } catch {
+          navigate('/?login=technician');
+        }
       } else {
         setIsAuthorized(true);
       }
     };
     checkAuth();
-  }, [user, isAuthenticated, navigate]);
+  }, [user, isAuthenticated, navigate, fetchMe]);
 
   if (isAuthorized === null) return null;
 
